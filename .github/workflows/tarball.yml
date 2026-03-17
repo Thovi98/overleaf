@@ -1,0 +1,107 @@
+name: Create and attach tarball to Release
+
+on:
+  release:
+    types: [edited]
+   # types: [published]
+
+jobs:
+  attach_assets:
+    name: Attach Tarball
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to upload release assets
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      
+      # ---------- NPM INSTALL EVERY SERVICE ----------
+      - name: Build chat
+        working-directory: ./services/chat
+        run: npm install --omit=dev
+
+      - name: Build clsi
+        working-directory: ./services/clsi
+        run: npm install --omit=dev
+
+      - name: Build contacts
+        working-directory: ./services/contacts
+        run: npm install --omit=dev
+
+      - name: Build docstore
+        working-directory: ./services/docstore
+        run: npm install --omit=dev
+
+      - name: Build document-updater
+        working-directory: ./services/document-updater
+        run: npm install --omit=dev
+
+      - name: Build filestore
+        working-directory: ./services/filestore
+        run: npm install --omit=dev
+
+      - name: Build history-v1
+        working-directory: ./services/history-v1
+        run: npm install --omit=dev
+
+      - name: Build notifications
+        working-directory: ./services/notifications
+        run: npm install --omit=dev
+
+      - name: Build project-history
+        working-directory: ./services/project-history
+        run: npm install --omit=dev
+
+      - name: Build real-time
+        working-directory: ./services/real-time
+        run: npm install --omit=dev
+
+      - name: Build web
+        working-directory: ./services/web
+        run: npm install --omit=dev
+
+      # ---------- COMPILE WEB ----------
+      - name: Compile web
+        working-directory: ./services/web
+        run: |
+          npm run precompile-pug
+          npm install --include=dev
+          npm run webpack:production
+          npm prune --omit=dev
+          npm run 'lezer-latex:generate'
+
+      # ---------- PACKAGE ----------
+      - name: Prepare release folder
+        run: |
+          mkdir -p release/
+          mkdir -p release/
+          
+          cp -r services/chat/* release/chat/
+          cp -r services/clsi/* release/clsi/
+          cp -r services/contacts/* release/contacts/
+          cp -r services/docstore/* release/docstore/
+          cp -r services/document-updater/* release/document-updater/
+          cp -r services/filestore/* release/filestore/
+          cp -r services/history-v1/* release/history-v1/
+          cp -r services/notifications/* release/notifications/
+          cp -r services/project-history/* release/project-history/
+          cp -r services/real-time/* release/real-time/
+          cp -r services/web/* release/web/
+
+      # ---------- COMPRESS ----------
+      - name: Compress release
+        run: tar -czvf Overleaf.tar.gz release/
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            Overleaf.tar.gz
+
+        
