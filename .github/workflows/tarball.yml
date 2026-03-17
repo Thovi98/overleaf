@@ -2,8 +2,7 @@ name: Create and attach tarball to Release
 
 on:
   release:
-    types: [edited]
-   # types: [published]
+    types: [published]
 
 jobs:
   attach_assets:
