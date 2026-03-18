@@ -44,19 +44,9 @@ jobs:
       - name: Prepare release folder
         run: |
           mkdir -p release/
-          mkdir -p release/
+          mkdir -p release/services/
           
-          cp -r services/chat/* release/chat/
-          cp -r services/clsi/* release/clsi/
-          cp -r services/contacts/* release/contacts/
-          cp -r services/docstore/* release/docstore/
-          cp -r services/document-updater/* release/document-updater/
-          cp -r services/filestore/* release/filestore/
-          cp -r services/history-v1/* release/history-v1/
-          cp -r services/notifications/* release/notifications/
-          cp -r services/project-history/* release/project-history/
-          cp -r services/real-time/* release/real-time/
-          cp -r services/web/* release/web/
+          cp -r services/* release/services/
 
       # ---------- COMPRESS ----------
       - name: Compress release
