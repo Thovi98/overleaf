@@ -1,63 +1,81 @@
-name: Create and attach tarball to Release
+name: Create Overleaf tarball
 
 on:
-  release:
-    types: [published]
+  schedule:
+    - cron: '0 21 * * 0'
+  workflow_dispatch:
 
 jobs:
-  attach_assets:
-    name: Attach Tarball
+  build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Required to upload release assets
-
+      contents: write
+      
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 22
-      
-      - name: Install npm packages
+          cache: 'npm'
+    
+      - name: Get latest commit
+        id: commit
         run: |
-          npm install -g npm@11.6.2
+          COMMIT=$(git ls-remote https://github.com/overleaf/overleaf.git HEAD | cut -f1)
+          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
+          
+      - name: Clone Overleaf
+        run: |
+          git clone https://github.com/overleaf/overleaf.git overleaf
+          cd overleaf
+          git checkout ${{ steps.commit.outputs.commit }}
 
-  
-      # ---------- NPM INSTALL EVERY SERVICE ----------
+      - name: Get npm version from package.json
+        id: npm
+        run: |
+          cd overleaf
+          NPM_VERSION=$(jq -r '.engines.npm' package.json)
+          echo "npm_version=$NPM_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Install correct npm version
+        run: npm install -g npm@${{ steps.npm.outputs.npm_version }}
+
+      - name: Define version
+        id: version
+        run: |
+          VERSION="$(date +%Y%m%d)-${{ steps.commit.outputs.commit }}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
       - name: Install npm packages
+        working-directory: overleaf
         run: |
           npm install
 
-      # ---------- COMPILE WEB ----------
       - name: Compile web
-        working-directory: ./services/web
+        working-directory: overleaf/services/web
         run: |
           npm run precompile-pug
           npm install --include=dev
           npm run webpack:production
           npm prune --omit=dev
 
-
-      # ---------- PACKAGE ----------
       - name: Prepare release folder
         run: |
-          mkdir -p release/
           mkdir -p release/services/
           mkdir -p release/libraries/
           
-          cp -r services/* release/services/
-          cp -r libraries/* release/libraries/
+          cp -r overleaf/services/* release/services/
+          cp -r overleaf/libraries/* release/libraries/
 
-      # ---------- COMPRESS ----------
-      - name: Compress release
-        run: tar -czvf Overleaf.tar.gz release/
+      - name: Compress Release
+        run: tar -czf overleaf-${{ steps.version.outputs.version }}.tar.gz release/
 
-      - name: Upload Release Assets
+      - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            overleaf.tar.gz
+          tag_name: overleaf-${{ steps.version.outputs.version }}
+          name: Overleaf build ${{ steps.version.outputs.version }}
+          files: overleaf-${{ steps.version.outputs.version }}.tar.gz
 
         
