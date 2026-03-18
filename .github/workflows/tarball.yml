@@ -44,7 +44,7 @@ jobs:
       - name: Define version
         id: version
         run: |
-          VERSION="$(date +%Y%m%d)-${{ steps.commit_full.outputs.commit_full }}"
+          VERSION="$(date +%Y%m%d)-${{ steps.commit_short.outputs.commit_short }}"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           
       - name: Install npm packages
