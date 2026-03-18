@@ -28,7 +28,7 @@ jobs:
       # ---------- NPM INSTALL EVERY SERVICE ----------
       - name: Install npm packages
         run: |
-          npm install --omit=dev
+          npm install
 
       # ---------- COMPILE WEB ----------
       - name: Compile web
