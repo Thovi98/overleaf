@@ -74,8 +74,8 @@ jobs:
       - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.commit_short.outputs.commit_short }}"
-          name: Overleaf build ${{ steps.version.outputs.version }}
-          files: overleaf-${{ steps.version.outputs.version }}.tar.gz
+          tag_name: ${{ steps.version.outputs.version }}
+          name: Overleaf ${{ steps.version.outputs.version }}
+          files: overleaf_${{ steps.version.outputs.version }}.tar.gz
 
         
