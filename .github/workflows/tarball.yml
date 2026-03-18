@@ -38,7 +38,7 @@ jobs:
           npm install --include=dev
           npm run webpack:production
           npm prune --omit=dev
-          npm run 'lezer-latex:generate'
+
 
       # ---------- PACKAGE ----------
       - name: Prepare release folder
