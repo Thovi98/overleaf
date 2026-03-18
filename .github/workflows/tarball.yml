@@ -21,52 +21,54 @@ jobs:
           node-version: 22
       
       - name: Install npm packages
-        run: npm i patch-package
+        run: |
+          npm install -g npm@11.6.2
+          npm install patch-package --save-dev
       
       # ---------- NPM INSTALL EVERY SERVICE ----------
       - name: Build chat
         working-directory: ./services/chat
-        run: npm ci --omit=dev
+        run: npm ci
 
       - name: Build clsi
         working-directory: ./services/clsi
-        run: npm install --omit=dev
+        run: npm install 
 
       - name: Build contacts
         working-directory: ./services/contacts
-        run: npm install --omit=dev
+        run: npm install
 
       - name: Build docstore
         working-directory: ./services/docstore
-        run: npm install --omit=dev
+        run: npm install
 
       - name: Build document-updater
         working-directory: ./services/document-updater
-        run: npm install --omit=dev
+        run: npm install
 
       - name: Build filestore
         working-directory: ./services/filestore
-        run: npm install --omit=dev
+        run: npm install
 
       - name: Build history-v1
         working-directory: ./services/history-v1
-        run: npm install --omit=dev
+        run: npm install
 
       - name: Build notifications
         working-directory: ./services/notifications
-        run: npm install --omit=dev
+        run: npm install
 
       - name: Build project-history
         working-directory: ./services/project-history
-        run: npm install --omit=dev
+        run: npm install 
 
       - name: Build real-time
         working-directory: ./services/real-time
-        run: npm install --omit=dev
+        run: npm install 
 
       - name: Build web
         working-directory: ./services/web
-        run: npm install --omit=dev
+        run: npm install 
 
       # ---------- COMPILE WEB ----------
       - name: Compile web
