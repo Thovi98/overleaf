@@ -69,7 +69,7 @@ jobs:
           cp -r overleaf/libraries/* release/libraries/
 
       - name: Compress Release
-        run: tar -czf overleaf-${{ steps.version.outputs.version }}.tar.gz release/
+        run: tar -czf overleaf_${{ steps.version.outputs.version }}.tar.gz release/
 
       - name: Publish Release
         uses: softprops/action-gh-release@v2
