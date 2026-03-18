@@ -28,7 +28,7 @@ jobs:
       # ---------- NPM INSTALL EVERY SERVICE ----------
       - name: Build chat
         working-directory: ./services/chat
-        run: npm install
+        run: npm ci --omit=dev
 
       - name: Build clsi
         working-directory: ./services/clsi
