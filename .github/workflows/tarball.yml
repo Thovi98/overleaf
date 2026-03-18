@@ -19,16 +19,17 @@ jobs:
           node-version: 22
     
       - name: Get latest commit
-        id: commit
+        id: commit_short
         run: |
-          COMMIT=$(git ls-remote https://github.com/overleaf/overleaf.git HEAD | cut -f1)
-          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
+          FULL=$(git ls-remote https://github.com/overleaf/overleaf.git HEAD | cut -f1)
+          SHORT=${FULL:0:7}
+          echo "commit_short=$SHORT" >> $GITHUB_OUTPUT
           
       - name: Clone Overleaf
         run: |
           git clone https://github.com/overleaf/overleaf.git overleaf
           cd overleaf
-          git checkout ${{ steps.commit.outputs.commit }}
+          git checkout ${{ steps.commit_short.outputs.commit_short }}
 
       - name: Get npm version from package.json
         id: npm
@@ -43,7 +44,7 @@ jobs:
       - name: Define version
         id: version
         run: |
-          VERSION="$(date +%Y%m%d)-${{ steps.commit.outputs.commit }}"
+          VERSION="$(date +%Y%m%d)-${{ steps.commit_full.outputs.commit_full }}"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           
       - name: Install npm packages
@@ -73,7 +74,7 @@ jobs:
       - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ steps.commit_short.outputs.commit_short }}"
           name: Overleaf build ${{ steps.version.outputs.version }}
           files: overleaf-${{ steps.version.outputs.version }}.tar.gz
 
